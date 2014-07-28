@@ -1,0 +1,16 @@
+<!-- begin #mainContent -->
+<div id="mainContent">
+  	<h2>Витрина</h2>
+    {% for ware_rec in wares %}
+    <div class="shopId">
+      	<div class="shopIdHeader">
+           	<div class="shopIdPrice">{{ ware_rec.price}}</div>
+            <div><input type="button" value="Заказать" class="buttonbuy" /></div>
+        </div>
+        <div><img src="/media/images/{{ ware_rec.uuid }}.jpg" width=183 height=113 alt="" /></div>
+        <div class="shopIdTitle">{{ ware_rec.label }}</div>
+    </div>
+    {% endfor %}
+
+</div>
+<!-- end #mainContent -->

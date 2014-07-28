@@ -1,0 +1,10 @@
+<!-- begin #sidebar1 -->
+<div id="sidebar1">
+   	<h2>Каталог</h2>
+    <ul id="sidebarlist">
+        {% for catalog_rec in catalog %}
+        <li><a href="#">{{ catalog_rec.label }}</a></li>
+        {% endfor %}
+    </ul>
+</div>
+<!-- end #sidebar1 -->
