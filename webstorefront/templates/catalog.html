@@ -3,7 +3,7 @@
    	<h2>Каталог</h2>
     <ul id="sidebarlist">
         {% for catalog_rec in catalog %}
-        <li><a href="#">{{ catalog_rec.label }}</a></li>
+        <li><a onclick="on_catalog_click('{{ catalog_rec.uuid }}')">{{ catalog_rec.label }}</a></li>
         {% endfor %}
     </ul>
 </div>

@@ -12,6 +12,9 @@ urlpatterns = patterns('',
     # url(r'^$', 'webstorefront.views.home', name='home'),
     # url(r'^blog/', include('blog.urls')),
 
+    #Ajax-запросы
+    url(r'^ajaxgetcontent/(?P<catalog_uuid>[^/]+)/$', webstorefront.views.ajax_get_content_data),
+
     url(r'^admin/', include(admin.site.urls)),
 
     url(r'^$', webstorefront.views.main_view),
