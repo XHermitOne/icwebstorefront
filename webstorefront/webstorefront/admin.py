@@ -13,5 +13,5 @@ class icWareAdmin(admin.ModelAdmin):
 
     list_display = ['label', 'img']
 
-admin.site.register(models.icCatalog, icCatalogAdmin)
-admin.site.register(models.icWare, icWareAdmin)
+admin.site.register(models.Catalog, icCatalogAdmin)
+admin.site.register(models.Ware, icWareAdmin)

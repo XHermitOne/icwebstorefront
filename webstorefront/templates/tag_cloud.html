@@ -1,0 +1,8 @@
+<div class="tagsblock">
+    <h2>Облако тегов</h2>
+	<div class="tags">
+        {% for tag in tags %}
+        <a href="?tag_filter={{ tag.id }}" class="tag">{{ tag.label }}</a>
+        {% endfor %}
+	</div>
+</div>
