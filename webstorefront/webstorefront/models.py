@@ -74,3 +74,23 @@ class New(models.Model):
 
     def __unicode__(self):
         return self.title
+
+
+class Order(models.Model):
+    """
+    Заказ.
+    """
+    uuid = models.CharField(max_length=140, default=lambda: str(uuid.uuid4()))
+    address = models.TextField()
+    date_create = models.DateTimeField(default=now)
+
+
+class OrderPos(models.Model):
+    """
+    Позиция заказа.
+    """
+    ware_uuid = models.CharField(max_length=140, null=True)
+    count = models.PositiveIntegerField()
+    summ = models.FloatField()
+    order = models.ForeignKey(Order, related_name='positions')
+

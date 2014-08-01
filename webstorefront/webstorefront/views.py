@@ -3,6 +3,8 @@
 from django.shortcuts import render_to_response
 from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect
 from django.core import paginator
+from django.db.models import Sum
+from django.conf import settings
 
 try:
     import json
@@ -10,6 +12,7 @@ except ImportError:
     from django.utils import simplejson as json
 
 from . import models
+from . import utils
 
 import logging
 
@@ -100,3 +103,88 @@ def news_view(request):
     context['tags'] = models.NewsTag.objects.all()
 
     return render_to_response('news.html', context)
+
+
+def ajax_new_order(request, ware_uuid):
+    """
+    Добавить новый заказ через Ajax.
+    @param  ware_uuid: UUID выбранного товара.
+    """
+    logger.debug('START new order')
+    if request.method == 'GET':
+        try:
+            #Определить нужный нам заказ
+            order = models.Order()
+            order.save()
+            #Добавить позицию заказа если новый товар
+            ware = models.Ware.objects.get(uuid=ware_uuid)
+            pos = order.positions.create(ware_uuid=ware_uuid, count=1, summ=ware.price)
+            pos.save()
+
+            return HttpResponse(order.uuid)
+        except:
+            logger.error('New order')
+            raise
+    logger.error('New order GET query')
+    return HttpResponse('error')
+
+
+def ajax_add_order(request, ware_uuid, order_uuid):
+    """
+    Добавить товар в заказ через Ajax.
+    @param  ware_uuid: UUID выбранного товара.
+    """
+    logger.debug('START')
+    if request.method == 'GET':
+        try:
+            #Определить нужный нам заказ
+            order = models.Order.objects.get(uuid=order_uuid)
+
+            ware = models.Ware.objects.get(uuid=ware_uuid)
+            positions = order.positions.all().filter(ware_uuid=ware_uuid)
+            if positions:
+                #Если позиция с таким товаром есть то просто увеличить
+                #количество и сумму позиции
+                pos = positions[0]
+                pos.count += 1
+                pos.summ += ware.price
+            else:
+                pos = order.positions.create(ware_uuid=ware_uuid, count=1, summ=ware.price)
+            pos.save()
+
+            return HttpResponse(order.uuid)
+        except:
+            logger.error('Add ware in order <%s>' % order_uuid)
+            raise
+    logger.error('Add ware in order <%s> GET query' % order_uuid)
+    return HttpResponse('error')
+
+
+def order_view(request, order_uuid):
+    """
+    Страница заказа.
+    """
+    order = models.Order.objects.get(uuid=order_uuid)
+
+    context = dict()
+    context['order'] = order
+
+    positions=[]
+    for rec in order.positions.all().values():
+        rec['ware_label'] = models.Ware.objects.get(uuid=rec['ware_uuid'])
+        positions.append(rec)
+    context['positions'] = positions
+    context['pos_count'] = order.positions.all().count()
+    context['sum_result'] = order.positions.all().aggregate(sum_result=Sum('summ'))['sum_result']
+
+    return render_to_response('order.html', context)
+
+def ajax_perform_order(request, order_uuid):
+    """
+    Отправить сообщение на подтверждение заказа исполнителю через Ajax.
+    """
+    order = models.Order.objects.get(uuid=order_uuid)
+    text = u'\n'.join(['%s\t%s\t%s' % (models.Ware.objects.get(uuid=pos.ware_uuid).label, pos.count, pos.summ) for pos in order.positions.all()])
+    utils.send_email(settings.EMAIL_FROM, settings.EMAIL_TO,
+                     u'Заказ', text.encode(settings.DEFAULT_ENCODING))
+    return HttpResponse('OK')

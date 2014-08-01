@@ -1,0 +1,37 @@
+<!-- begin #newsContent -->
+<div id="orderContent">
+  	<h2>Выш заказ от {{ order.date_create}}</h2>
+
+    <table width="100%" border="1">
+        <tr>
+            <td>
+          	    <div><b>Наименование</b></div>
+            </td>
+            <td>
+          	    <div><b>Количество</b></div>
+            </td>
+            <td>
+          	    <div><b>Сумма</b></div>
+            </td>
+        </tr>
+    {% for pos in positions %}
+        <tr>
+            <td>
+          	    <div>{{ pos.ware_label }}</div>
+            </td>
+            <td>
+          	    <div>{{ pos.count }}</div>
+            </td>
+            <td>
+          	    <div>{{ pos.summ }}</div>
+            </td>
+        </tr>
+    {% endfor %}
+
+    </table>
+  	<h2>Итого: {{ sum_result }}</h2>
+
+   	<input type="button" value="Подтвердить" onclick="on_perform_order_click('{{ order.uuid }}')" />
+
+</div>
+<!-- end #newsContent -->

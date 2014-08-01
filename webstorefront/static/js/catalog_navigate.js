@@ -31,10 +31,11 @@ function create_content_html(content_data)
         var label = content_data[i].label;
         var price = content_data[i].price;
         var img = content_data[i].img;
+        var uuid = content_data[i].uuid;
 
         var wareHTML = $('<div class=\"shopId\"><div class=\"shopIdHeader\"></div></div>');
         var priceHTML = $('<div class=\"shopIdPrice\">'+price+'</div>');
-        var buttonBuyHTML = $('<div><input type=\"button\" value=\"Заказать\" class=\"buttonbuy\" /></div>');
+        var buttonBuyHTML = $('<div><input type=\"button\" value=\"Заказать\" class=\"buttonbuy\" onclick=\"on_order_button_click(\''+uuid+'\')\"/></div>');
         var imgHTML = $('<div><img src=\"/media/images/'+img+'\" width=183 height=113 alt=\"\" /></div>');
         var labelHTML = $('<div class=\"shopIdTitle\">'+label+'</div>');
 

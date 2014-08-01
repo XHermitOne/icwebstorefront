@@ -182,3 +182,9 @@ LOGGING = {
         },
     }
 }
+
+
+EMAIL_FROM = 'xhermitone@gmail.com'
+EMAIL_TO = 'xhermit@rambler.ru'
+DEFAULT_ENCODING = 'utf-8'
+
