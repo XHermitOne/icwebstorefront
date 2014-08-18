@@ -105,6 +105,14 @@ def news_view(request):
     return render_to_response('news.html', context)
 
 
+#def about_view(request):
+#    """
+#    Страница <О нас>.
+#    """
+
+#    return render_to_response('news.html', context)
+
+
 def ajax_new_order(request, ware_uuid):
     """
     Добавить новый заказ через Ajax.
@@ -178,6 +186,7 @@ def order_view(request, order_uuid):
     context['sum_result'] = order.positions.all().aggregate(sum_result=Sum('summ'))['sum_result']
 
     return render_to_response('order.html', context)
+
 
 def ajax_perform_order(request, order_uuid):
     """

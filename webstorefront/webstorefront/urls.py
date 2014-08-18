@@ -22,6 +22,7 @@ urlpatterns = patterns('',
 
     url(r'^news/', webstorefront.views.news_view),
     url(r'^order/(?P<order_uuid>[^/]+)/$', webstorefront.views.order_view),
+    #url(r'^about/', webstorefront.views.about_view),
 
     url(r'^$', webstorefront.views.main_view),
 
