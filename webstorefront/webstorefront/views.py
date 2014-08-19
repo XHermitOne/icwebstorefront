@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.shortcuts import render_to_response
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect
+from django.http import HttpResponse, HttpResponseRedirect, HttpResponsePermanentRedirect, Http404
 from django.core import paginator
 from django.db.models import Sum
 from django.conf import settings
@@ -55,6 +55,7 @@ def main_view(request):
     context = dict()
     context['catalog'] = models.Catalog.objects.all()
     context['wares'] = prepare_wares(request)
+    context['pos_count'] = models.Order.objects.get(uuid=request.session['CURRENT_ORDER']).positions.all().count() if 'CURRENT_ORDER' in request.session else 0
 
     return render_to_response('index.html', context)
 
@@ -69,7 +70,7 @@ def ajax_get_content_data(request, catalog_uuid):
         return HttpResponse(json.dumps(data), content_type='application/json')
 
     logger.error('Get content data catalog <%s> POST query' % catalog_uuid)
-    return HttpResponse('error')
+    return Http404()
 
 
 def news_view(request):
@@ -101,16 +102,9 @@ def news_view(request):
     context = dict()
     context['news'] = news
     context['tags'] = models.NewsTag.objects.all()
+    context['pos_count'] = models.Order.objects.get(uuid=request.session['CURRENT_ORDER']).positions.all().count() if 'CURRENT_ORDER' in request.session else 0
 
     return render_to_response('news.html', context)
-
-
-#def about_view(request):
-#    """
-#    Страница <О нас>.
-#    """
-
-#    return render_to_response('news.html', context)
 
 
 def ajax_new_order(request, ware_uuid):
@@ -129,12 +123,17 @@ def ajax_new_order(request, ware_uuid):
             pos = order.positions.create(ware_uuid=ware_uuid, count=1, summ=ware.price)
             pos.save()
 
-            return HttpResponse(order.uuid)
+            request.session['CURRENT_ORDER'] = order.uuid
+
+            data = {'order_uuid': order.uuid, 'pos_count': order.positions.all().count()}
+            return HttpResponse(json.dumps(data), content_type='application/json')
         except:
             logger.error('New order')
+            #return Http404()
             raise
+
     logger.error('New order GET query')
-    return HttpResponse('error')
+    return Http404()
 
 
 def ajax_add_order(request, ware_uuid, order_uuid):
@@ -160,18 +159,23 @@ def ajax_add_order(request, ware_uuid, order_uuid):
                 pos = order.positions.create(ware_uuid=ware_uuid, count=1, summ=ware.price)
             pos.save()
 
-            return HttpResponse(order.uuid)
+            data = {'order_uuid': order.uuid, 'pos_count': order.positions.all().count()}
+            #logger.debug('Count data %s' % data)
+            return HttpResponse(json.dumps(data), content_type='application/json')
         except:
             logger.error('Add ware in order <%s>' % order_uuid)
+            #return Http404()
             raise
+
     logger.error('Add ware in order <%s> GET query' % order_uuid)
-    return HttpResponse('error')
+    return Http404()
 
 
 def order_view(request, order_uuid):
     """
     Страница заказа.
     """
+    logger.info('Request: %s' % request)
     order = models.Order.objects.get(uuid=order_uuid)
 
     context = dict()

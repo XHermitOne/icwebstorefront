@@ -13,6 +13,7 @@ function on_show_order_click()
 {
     if(CUR_ORDER_UUID==null) {
         alert("Заказ не определен");
+        $('#orderposcount').text("0");
     }
     else
     {
@@ -46,20 +47,27 @@ function ajax_add_order(ware_uuid)
     //Отправка Ajax запроса
     if(CUR_ORDER_UUID==null) {
         $.get("/ajaxneworder/" + ware_uuid + "/")
-            .done(function (uuid) {
+            .done(function (data) {
+                uuid = data.order_uuid;
+                count = data.pos_count;
                 //Получение ответа от сервера
-                console.log("New UUID " + uuid);
+                console.log("New UUID " + uuid + " Count "+count);
                 CUR_ORDER_UUID = uuid;
+                $('#orderposcount').text(count);
             });
     }
     else
     {
         $.get("/ajaxaddorder/" + ware_uuid + "/" + CUR_ORDER_UUID + "/")
-            .done(function (uuid) {
+            .done(function (data) {
+                uuid = data.order_uuid;
+                count = data.pos_count;
                 //Получение ответа от сервера
-                console.log("UUID " + uuid);
+                console.log("UUID " + uuid + " Count "+count);
+                $('#orderposcount').text(count);
             });
 
     }
+
 
 }
